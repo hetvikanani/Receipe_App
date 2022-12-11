@@ -1,11 +1,36 @@
 const mealsContainer = document.getElementById("meals-container");
 
+const favMeal = document.getElementById("fav-meals");
+
+const mealPopup = document.getElementById("meal-popup");
+const closePopup = document.getElementById("close-popup");
+const mealInfoEl = document.getElementById("meal-info");
+
 const randomMeal = async () => {
   const z = await fetch("https://www.themealdb.com/api/json/v1/1/random.php");
   const zz = await z.json();
   const randomMeal = zz.meals[0];
 
   loadMeal(randomMeal);
+};
+
+const mealById = async (id) => {
+  const z = await fetch(
+    "https://www.themealdb.com/api/json/v1/1/lookup.php?i=" + id
+  );
+  const zz = await z.json();
+  const randomMeal = zz.meals[0];
+
+  return randomMeal;
+};
+
+const mealSearch = async (val) => {
+  const z = await fetch(
+    "https://www.themealdb.com/api/json/v1/1/search.php?s=" + val
+  );
+  const zz = await z.json();
+  const searchApi = zz.meals;
+  return searchApi;
 };
 
 const loadMeal = (meal) => {
@@ -27,18 +52,25 @@ const loadMeal = (meal) => {
   </div>`;
 
   const btn = document.querySelector(".meal-body .fav-btn");
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", async () => {
     if (btn.classList.contains("active")) {
       removeLocalStorage(meal.idMeal);
       btn.classList.remove("active");
+      fetchFavMeal();
     } else {
       addLocalStorage(meal.idMeal);
+      const z = await mealById(meal.idMeal);
+      addMeal(z);
       btn.classList.add("active");
     }
+    // fetchFavMeal();
+  });
+  mealsContainer.addEventListener("click", () => {
+    showMealInfo(meal);
   });
 };
 
-removeLocalStorage = (idmeal) => {
+const removeLocalStorage = (idmeal) => {
   const data = getLocalStorage();
 
   const perticular = data.filter((remove) => {
@@ -51,14 +83,97 @@ removeLocalStorage = (idmeal) => {
   localStorage.setItem("mealId", JSON.stringify(perticular));
 };
 
-getLocalStorage = () => {
+const getLocalStorage = () => {
   const data = JSON.parse(localStorage.getItem("mealId"));
   return data && data.length > 0 ? data : [];
 };
 
-addLocalStorage = (idmeal) => {
+const addLocalStorage = (idmeal) => {
   const data = getLocalStorage();
   localStorage.setItem("mealId", JSON.stringify([...data, idmeal]));
 };
 
+const fetchFavMeal = async () => {
+  favMeal.innerHTML = "";
+  const mealIds = getLocalStorage();
+  for (let i = 0; i < mealIds.length; i++) {
+    const mealId = mealIds[i];
+    meal = await mealById(mealId);
+    // console.log(meal);
+    addMeal(meal);
+  }
+  //   document.querySelectorAll(".clear").forEach((d) => {
+  //     d.addEventListener("click", zzz);
+  //   });
+};
+
+// const zzz = (e) => {
+//   removeLocalStorage(e.target.id);
+//   fetchFavMeal();
+// };
+
+const addMeal = (meal) => {
+  const li = document.createElement("li");
+  li.innerHTML = `<img
+  src="${meal.strMealThumb}"
+/>
+<span>${meal.strMeal}</span>
+<button class="clear" id=${meal.idMeal}><i class="fa fa-window-close"></i></button>
+`;
+
+  li.querySelector(".clear").addEventListener("click", () => {
+    removeLocalStorage(meal.idMeal);
+    fetchFavMeal();
+  });
+  li.addEventListener("click", () => {
+    showMealInfo(meal);
+  });
+  favMeal.append(li);
+};
+
 randomMeal();
+fetchFavMeal();
+
+const search = document.getElementById("search");
+const searchInput = document.getElementById("search-input");
+
+search.addEventListener("click", async () => {
+  mealsContainer.innerHTML = "";
+
+  const sInput = searchInput.value;
+  const sItem = await mealSearch(sInput);
+
+  if (sItem) {
+    sItem.forEach((element) => {
+      loadMeal(element);
+      //   addMeal(element);
+    });
+  }
+});
+
+const showMealInfo = (mealData) => {
+  mealInfoEl.innerHTML = "";
+  const mealEl = document.createElement("div");
+  const indigrants = [];
+  for (let i = 0; i <= 20; i++) {
+    if (mealData[`strIngredient` + i]) {
+      indigrants.push(`${mealData[`strIngredient` + i]}`);
+    } else {
+      break;
+    }
+  }
+  mealEl.innerHTML = `
+  <h1>${mealData.strMeal}</h1>
+  <img src="${mealData.strMealThumb}" />
+  <p>${mealData.strInstructions}</p>
+  <h3>Indigrants:</h3>
+  <ul>${indigrants.map((i) => `<li>${i}</li>`).join("")}</ul>
+  `;
+
+  mealInfoEl.appendChild(mealEl);
+  mealPopup.classList.remove("hidden");
+};
+
+closePopup.addEventListener("click", () => {
+  mealPopup.classList.add("hidden");
+});
