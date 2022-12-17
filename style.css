@@ -11,10 +11,11 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  margin: 0;
 }
 
 .mobile-container {
-  margin: 400px;
+  margin: 40px;
   background-color: #fff;
   box-shadow: 0 0 10px 2px #3333331a;
   border-radius: 3px;
@@ -43,7 +44,7 @@ header input {
 header button {
   background-color: transparent;
   color: rgb(138, 129, 141);
-  font-size: 2rem;
+  font-size: 1.5rem;
   border: none;
   margin-left: 10px;
 }
@@ -56,16 +57,16 @@ header button {
 
 .fav-meals {
   display: flex;
-  list-style: none;
+  list-style-type: none;
   padding: 0;
-  overflow: auto;
+  /* overflow: auto; */
   flex-wrap: wrap;
-  align-items: center;
+  /* align-items: center; */
   justify-content: center;
 }
 
 .fav-meals li {
-  width: 85px;
+  width: 75px;
   margin: 5px;
   position: relative;
   cursor: pointer;
@@ -100,7 +101,7 @@ header button {
   font-size: 0.9rem;
   white-space: nowrap;
   overflow: hidden;
-  /* text-overflow: ellipsis; */
+  text-overflow: ellipsis;
   width: 75px;
 }
 
@@ -169,7 +170,6 @@ header button {
 
 .popup-container.hidden {
   opacity: 0;
-  /* user-select: none; */
   pointer-events: none;
 }
 

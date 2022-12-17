@@ -99,18 +99,9 @@ const fetchFavMeal = async () => {
   for (let i = 0; i < mealIds.length; i++) {
     const mealId = mealIds[i];
     meal = await mealById(mealId);
-    // console.log(meal);
     addMeal(meal);
   }
-  //   document.querySelectorAll(".clear").forEach((d) => {
-  //     d.addEventListener("click", zzz);
-  //   });
 };
-
-// const zzz = (e) => {
-//   removeLocalStorage(e.target.id);
-//   fetchFavMeal();
-// };
 
 const addMeal = (meal) => {
   const li = document.createElement("li");
